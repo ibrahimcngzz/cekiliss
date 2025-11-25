@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Yılbaşı Çekilişi</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            text-align: center; 
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .card {
+            max-width: 420px;
+            margin: auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 14px;
+            border: 1px solid #ddd;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+        }
+        select, button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        #resetBtn {
+            background: #ffdddd;
+            border: 1px solid #ff7777;
+            color: #900;
+            margin-top: 20px;
+        }
+        #result {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        small {
+            display: block;
+            margin-top: 8px;
+            color: #666;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+    <h2>🎄 Yılbaşı Çekilişi 🎁</h2>
+    <p>İsmini seç ve kime hediye alacağını gör.</p>
+
+    <select id="nameSelect">
+        <option value="">-- İsmini Seç --</option>
+    </select>
+
+    <button id="showBtn">Kime çıktı?</button>
+
+    <div id="result"></div>
+    <small>Not: Bu cihazda çekiliş bir kez yapılır, sonra sonuçlar sabit kalır.</small>
+
+    <!-- 🔐 ŞİFRELİ RESET BUTONU -->
+    <button id="resetBtn">Çekilişi Sıfırla (Şifreli)</button>
+</div>
+
+<script>
+ 
+   // 👉 BURAYA GRUPTAKİ TÜM İSİMLERİ YAZ
+    const people = [
+        "İPEK",
+	"PINAR",
+        "ECE",
+        "HANDE",
+        "TUĞBA",
+        "ZEHRA",
+        "SUDE",
+        "İREM"
+    ];
+
+    // Dropdown doldur
+    const select = document.getElementById("nameSelect");
+    people.forEach(p => {
+        const opt = document.createElement("option");
+        opt.value = p;
+        opt.textContent = p;
+        select.appendChild(opt);
+    });
+
+    const STORAGE_KEY = "yilbasi_cekilisi_mapping_v1";
+    let mapping = null;
+
+    // ---------- RANDOM EŞLEŞTİRME ----------
+    function shuffle(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
+    function generateMapping(names) {
+        let receivers = shuffle([...names]);
+
+        while (true) {
+            let ok = true;
+            for (let i = 0; i < names.length; i++) {
+                if (names[i] === receivers[i]) ok = false;
+            }
+            if (ok) break;
+            receivers = shuffle([...names]);
+        }
+
+        const map = {};
+        for (let i = 0; i < names.length; i++) {
+            map[names[i]] = receivers[i];
+        }
+        return map;
+    }
+
+    // ---------- LOCALSTORAGE YÜKLEME ----------
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+        mapping = JSON.parse(saved);
+    } else {
+        mapping = generateMapping(people);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(mapping));
+    }
+
+    // ---------- SONUCU GÖSTER ----------
+    document.getElementById("showBtn").addEventListener("click", () => {
+        const name = select.value;
+        if (!name) {
+            alert("Lütfen önce listeden ismini seç.");
+            return;
+        }
+
+        document.getElementById("result").textContent =
+            `${name}, senin çekiliş hediyen → ${mapping[name]} 🎁`;
+    });
+
+    // ---------- 🔐 ŞİFRELİ RESET BUTONU ----------
+    document.getElementById("resetBtn").addEventListener("click", () => {
+        const pass = prompt("🔐 Çekilişi sıfırlamak için şifreyi gir:");
+
+        // 👉 ŞİFRE BURADA (İstediğin gibi değiştir)
+        const correctPassword = "1234";
+
+        if (pass === correctPassword) {
+            localStorage.clear();
+            alert("✔ Çekiliş başarıyla sıfırlandı!");
+            location.reload();
+        } else {
+            alert("❌ Şifre yanlış!");
+        }
+    });
+</script>
+</body>
+</html>
+
