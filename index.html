@@ -68,7 +68,7 @@
  
    // 👉 BURAYA GRUPTAKİ TÜM İSİMLERİ YAZ
     const people = [
-        "İPEK ❤️",
+        "İPEK",
 	"PINAR",
         "ECE",
         "HANDE",
@@ -81,9 +81,13 @@
     // Dropdown doldur
     const select = document.getElementById("nameSelect");
     people.forEach(p => {
-        const opt = document.createElement("option");
-        opt.value = p;
-        opt.textContent = p;
+    	const opt = document.createElement("option");
+    	opt.value = p;
+		if (p === "İPEK") {  
+			opt.textContent = p + " ❤️";
+		} else {
+        	opt.textContent = p;
+		}
         select.appendChild(opt);
     });
 
@@ -157,5 +161,6 @@
 </script>
 </body>
 </html>
+
 
 
